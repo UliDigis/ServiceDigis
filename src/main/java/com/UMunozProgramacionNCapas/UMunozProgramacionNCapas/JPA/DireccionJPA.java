@@ -1,0 +1,91 @@
+package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+
+@Entity
+@Table(name = "direccion")
+public class DireccionJPA {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "iddireccion")
+    private int IdDireccion;
+    
+    @Column(name = "calle", nullable = false, unique = false)
+    private String Calle;
+    
+    @Column(name = "numerointerior", nullable = false, unique = false)
+    private String NumeroInterior;
+    
+    @Column(name = "numeroexterior", nullable = true, unique = false)
+    private String NumeroExterior;
+    
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idusuario", nullable = false)
+    public UsuarioJPA usuario;
+    
+    @ManyToOne(fetch  = FetchType.LAZY)
+    @JoinColumn(name = "idcolonia", nullable = false)
+    public ColoniaJPA colonia;
+
+    public int getIdDireccion() {
+        return IdDireccion;
+    }
+
+    public void setIdDireccion(int IdDireccion) {
+        this.IdDireccion = IdDireccion;
+    }
+
+    public String getCalle() {
+        return Calle;
+    }
+
+    public void setCalle(String Calle) {
+        this.Calle = Calle;
+    }
+
+    public String getNumeroInterior() {
+        return NumeroInterior;
+    }
+
+    public void setNumeroInterior(String NumeroInterior) {
+        this.NumeroInterior = NumeroInterior;
+    }
+
+    public String getNumeroExterior() {
+        return NumeroExterior;
+    }
+
+    public void setNumeroExterior(String NumeroExterior) {
+        this.NumeroExterior = NumeroExterior;
+    }
+
+//    public UsuarioJPA getUsuario() {
+//        return usuario;
+//    }
+//
+//    public void setUsuario(UsuarioJPA usuario) {
+//        this.usuario = usuario;
+//    }
+//
+//    public ColoniaJPA getColonia() {
+//        return colonia;
+//    }
+//
+//    public void setColonia(ColoniaJPA colonia) {
+//        this.colonia = colonia;
+//    }
+//    
+    
+
+}
