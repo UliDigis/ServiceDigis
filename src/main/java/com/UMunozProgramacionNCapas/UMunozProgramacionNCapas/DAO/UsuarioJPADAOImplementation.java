@@ -48,30 +48,33 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         return result;
     }
 
-//    @Override
-//    @Transactional
-//    public Result AddUsuarioJPA(Usuario usuario) {
-//
-//        Result result = new Result();
-//
-//        try {
-////            UsuarioJPA usuarioJPA = usuarioMapper.toEntity(usuario);
-//
-////            usuarioJPA.getDirecciones().get(0).setUsuario(usuarioJPA);
-////            entityManager.persist(usuarioJPA);
-//
-//            result.correct = true;
-////            result.Object = usuarioJPA.getIdUsuario();
-//
-//        } catch (Exception ex) {
-//            result.correct = false;
-//            result.errorMessage = ex.getLocalizedMessage();
-//            result.ex = ex;
-//
-//        }
-//
-//        return result;
-//    }
+    @Transactional
+    @Override
+    public Result Add(UsuarioJPA usuario) {
+        Result result = new Result();
+
+        try {
+
+            if (usuario == null) {
+                result.correct = false;
+                result.errorMessage = "El usuario llego vacio o hubo un problema";
+                result.status = 400;
+            } else {
+
+                entityManager.persist(usuario);
+
+                result.correct = true;
+                result.status = 201;
+            }
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.status = 500;
+        }
+
+        return result;
+    }
 
     @Override
     public Result GetById(int IdUsuario) {
@@ -96,4 +99,32 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
         return result;
     }
+
+    
+
+    // @Override
+    // @Transactional
+    // public Result AddUsuarioJPA(Usuario usuario) {
+    //
+    // Result result = new Result();
+    //
+    // try {
+    //// UsuarioJPA usuarioJPA = usuarioMapper.toEntity(usuario);
+    //
+    //// usuarioJPA.getDirecciones().get(0).setUsuario(usuarioJPA);
+    //// entityManager.persist(usuarioJPA);
+    //
+    // result.correct = true;
+    //// result.Object = usuarioJPA.getIdUsuario();
+    //
+    // } catch (Exception ex) {
+    // result.correct = false;
+    // result.errorMessage = ex.getLocalizedMessage();
+    // result.ex = ex;
+    //
+    // }
+    //
+    // return result;
+    // }
+    // son pruebas
 }
