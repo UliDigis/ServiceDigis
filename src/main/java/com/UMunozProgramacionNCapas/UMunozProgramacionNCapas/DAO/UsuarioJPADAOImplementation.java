@@ -53,13 +53,13 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     public Result Add(UsuarioJPA usuario) {
         Result result = new Result();
 
-        try{
+        try {
 
             if (usuario == null) {
                 result.correct = false;
                 result.errorMessage = "El usuario llego vacio o hubo un problema";
                 result.status = 400;
-            }else{
+            } else {
 
                 entityManager.persist(usuario);
 
@@ -67,14 +67,13 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 result.status = 201;
             }
 
-        }catch(Exception ex){
+        } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = ex.getMessage();
             result.status = 500;
         }
 
-
-         return result;
+        return result;
     }
 
     @Override
@@ -125,5 +124,5 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     //
     // return result;
     // }
-    // pruebas
+    // pruebas 2
 }
