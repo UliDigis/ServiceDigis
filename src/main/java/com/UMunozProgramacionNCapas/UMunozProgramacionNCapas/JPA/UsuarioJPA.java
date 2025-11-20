@@ -47,7 +47,7 @@ public class UsuarioJPA {
     @Column(name = "fechanacimiento", nullable = false, unique = false)
     private Date FechaNacimiento;
 
-    @Column(name = "sexo", nullable = false, unique = false, length = 2)
+    @Column(name = "sexo", nullable = false, unique = false, length = 1)
     private char Sexo;
 
     @Column(name = "telefono", nullable = false, unique = false, length = 20)
