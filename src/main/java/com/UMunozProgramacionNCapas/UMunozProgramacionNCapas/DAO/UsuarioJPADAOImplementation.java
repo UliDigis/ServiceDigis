@@ -125,4 +125,5 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     //
     // return result;
     // }
+    // pruebas
 }
