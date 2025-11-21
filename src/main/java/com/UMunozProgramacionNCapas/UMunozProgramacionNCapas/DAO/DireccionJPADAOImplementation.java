@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DireccionJPADAOImplementation {
+public class DireccionJPADAOImplementation implements IDireccion{
     
     @Autowired
     private EntityManager entityManager;
@@ -35,6 +35,31 @@ public class DireccionJPADAOImplementation {
         return result;
     }
 
-    
+    public Result DeleteDireccion(int IdDireccion){
+        
+        try{
+            
+            TypedQuery<DireccionJPA> query = entityManager.createQuery("FROM DireccionJPA d WHERE d.Direccion = :IdDireccion", DireccionJPA.class);
+            query.setParameter("IdDireccion",IdDireccion);
+            
+            List<DireccionJPA> direccionJPA = query.getResultList();
+            
+            if (direccionJPA != null) {
+                
+                DireccionJPA direccion = direccionJPA.get(0);
+                entityManager.remove(direccion);
+                result.correct = true;
+            }else{
+                result.correct = false;
+                result.errorMessage = "Direccion no encontrada";
+                result.status = 204;
+            }
+            
+        }catch(Exception ex){
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+        }
+        return result;
+    }
     
 }

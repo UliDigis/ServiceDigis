@@ -4,6 +4,7 @@ import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO.DireccionJPADAO
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,5 +35,22 @@ public class DireccionRestController {
 
         return ResponseEntity.status(result.status).body(result);
     }
+    
+    
+    @DeleteMapping("/delete/direccion")
+    public ResponseEntity<Result> DeleteDireccion(@RequestParam("IdDireccion") int IdDireccion){
+        
+        try{
+            result = direccionJPADAOImplementation.DeleteDireccion(IdDireccion);
+            result.correct = true;
+            result.status=200;
+        }catch(Exception ex){
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.status = 500;
+        }
+        return ResponseEntity.status(result.status).body(result);
+    }
+    
 
 }

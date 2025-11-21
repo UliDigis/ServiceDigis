@@ -100,48 +100,48 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     }
 
     @Override
-@Transactional
-public Result Delete(int IdUsuario) {
-    Result result = new Result();
+    @Transactional
+    public Result Delete(int IdUsuario) {
+        Result result = new Result();
 
-    try {
-        TypedQuery<UsuarioJPA> queryUsuario = entityManager.createQuery(
-                "FROM UsuarioJPA u WHERE u.IdUsuario = :IdUsuario", UsuarioJPA.class);
-        queryUsuario.setParameter("IdUsuario", IdUsuario);
-        List<UsuarioJPA> usuarios = queryUsuario.getResultList();
+        try {
+            TypedQuery<UsuarioJPA> queryUsuario = entityManager.createQuery(
+                    "FROM UsuarioJPA u WHERE u.IdUsuario = :IdUsuario", UsuarioJPA.class);
+            queryUsuario.setParameter("IdUsuario", IdUsuario);
+            List<UsuarioJPA> usuarios = queryUsuario.getResultList();
 
-        if (usuarios != null && !usuarios.isEmpty()) {
-            UsuarioJPA usuario = usuarios.get(0);
+            if (usuarios != null && !usuarios.isEmpty()) {
+                UsuarioJPA usuario = usuarios.get(0);
 
-            TypedQuery<DireccionJPA> queryDirecciones = entityManager.createQuery(
-                    "FROM DireccionJPA d WHERE d.usuario.IdUsuario = :IdUsuario",
-                    DireccionJPA.class);
-            queryDirecciones.setParameter("IdUsuario", IdUsuario);
-            List<DireccionJPA> direcciones = queryDirecciones.getResultList();
+                TypedQuery<DireccionJPA> queryDirecciones = entityManager.createQuery(
+                        "FROM DireccionJPA d WHERE d.usuario.IdUsuario = :IdUsuario",
+                        DireccionJPA.class);
+                queryDirecciones.setParameter("IdUsuario", IdUsuario);
+                List<DireccionJPA> direcciones = queryDirecciones.getResultList();
 
-            for (DireccionJPA d : direcciones) {
-                entityManager.remove(d);
+                for (DireccionJPA d : direcciones) {
+                    entityManager.remove(d);
+                }
+
+                entityManager.remove(usuario);
+
+                result.correct = true;
+                result.status = 202;
+                result.errorMessage = "Usuario eliminado correctamente";
+            } else {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado";
+                result.status = 404;
             }
 
-            entityManager.remove(usuario);
-
-            result.correct = true;
-            result.status = 202;
-            result.errorMessage = "Usuario eliminado correctamente";
-        } else {
+        } catch (Exception ex) {
             result.correct = false;
-            result.errorMessage = "Usuario no encontrado";
-            result.status = 404;
+            result.errorMessage = ex.getMessage();
+            result.status = 500;
         }
 
-    } catch (Exception ex) {
-        result.correct = false;
-        result.errorMessage = ex.getMessage();
-        result.status = 500;
+        return result;
     }
-
-    return result;
-}
     // @Override
     // @Transactional
     // public Result AddUsuarioJPA(Usuario usuario) {
