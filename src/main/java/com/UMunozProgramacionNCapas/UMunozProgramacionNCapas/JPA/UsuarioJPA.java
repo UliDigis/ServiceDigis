@@ -175,5 +175,6 @@ public class UsuarioJPA {
         this.Imagen = Imagen;
     }
 
+    
 
 }

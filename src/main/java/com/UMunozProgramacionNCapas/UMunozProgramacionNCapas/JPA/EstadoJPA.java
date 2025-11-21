@@ -41,12 +41,12 @@ public class EstadoJPA {
         this.Nombre = Nombre;
     }
 
-//    public PaisJPA getPais() {
-//        return pais;
-//    }
-//
-//    public void setPais(PaisJPA pais) {
-//        this.pais = pais;
-//    }
+    public PaisJPA getPais() {
+        return pais;
+    }
+
+    public void setPais(PaisJPA pais) {
+        this.pais = pais;
+    }
 
 }

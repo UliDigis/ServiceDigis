@@ -42,12 +42,12 @@ public class MunicipioJPA {
         this.Nombre = Nombre;
     }
 
-//    public EstadoJPA getEstado() {
-//        return estado;
-//    }
-//
-//    public void setEstado(EstadoJPA estado) {
-//        this.estado = estado;
-//    }
+    public EstadoJPA getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoJPA estado) {
+        this.estado = estado;
+    }
 
 }

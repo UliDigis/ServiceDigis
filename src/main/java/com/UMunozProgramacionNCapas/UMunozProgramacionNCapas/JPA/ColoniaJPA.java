@@ -52,4 +52,13 @@ public class ColoniaJPA {
         this.CodigoPostal = CodigoPostal;
     }
 
+    public MunicipioJPA getMunicipio() {
+        return municipio;
+    }
+
+    public void setMunicipio(MunicipioJPA municipio) {
+        this.municipio = municipio;
+    }
+    
+
 }
