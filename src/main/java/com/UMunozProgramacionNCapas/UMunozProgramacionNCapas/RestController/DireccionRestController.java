@@ -1,6 +1,8 @@
 package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.RestController;
 
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO.DireccionJPADAOImplementation;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,15 +13,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/direccion/")
 public class DireccionRestController {
 
+    @Autowired
+    private DireccionJPADAOImplementation direccionJPADAOImplementation;
+
     Result result = new Result();
 
-    @GetMapping
+    @GetMapping("/id")
     public ResponseEntity<Result> GetByIdDireccion(@RequestParam("IdDireccion") int IdDireccion) {
 
         try {
-            
-            
-            
+            result = direccionJPADAOImplementation.GetByIdDireccion(IdDireccion);
+            result.correct = true;
+            result.status = 200;
+
         } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = ex.getMessage();

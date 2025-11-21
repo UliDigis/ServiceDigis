@@ -2,8 +2,10 @@ package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA;
 
 // import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
@@ -30,13 +32,23 @@ public class DireccionJPA {
     private String NumeroExterior;
 
     @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "idusuario", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "idusuario", nullable = true)
     public UsuarioJPA usuario;
 
     @ManyToOne
     @JoinColumn(name = "idcolonia", nullable = false)
     public ColoniaJPA colonia;
+
+    @JsonProperty("IdUsuario")
+    public Integer getIdUsuario() {
+        if (this.usuario == null) return null;
+        try {
+            return this.usuario.getIdUsuario();
+        } catch (Exception ex) {
+            return null;
+        }
+    }
 
     public int getIdDireccion() {
         return IdDireccion;
