@@ -98,7 +98,35 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         return result;
     }
 
-    
+    @Override
+    @Transactional
+    public Result Delete(int IdUsuario) {
+        Result result = new Result();
+
+        try {
+            TypedQuery<UsuarioJPA> query = entityManager.createQuery("FROM UsuarioJPA u WHERE u.IdUsuario = :IdUsuario",UsuarioJPA.class);
+            query.setParameter("IdUsuario", IdUsuario);
+            List<UsuarioJPA> usuarioJPA = query.getResultList();
+            result.Object = usuarioJPA;
+
+            if (usuarioJPA  != null && !usuarioJPA.isEmpty()) {
+                entityManager.remove(usuarioJPA);
+                result.correct = true;
+                result.status = 202;
+            } else {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado";
+                result.status = 204;
+            }
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.status = 500;
+        }
+
+        return result;
+    }
 
     // @Override
     // @Transactional
