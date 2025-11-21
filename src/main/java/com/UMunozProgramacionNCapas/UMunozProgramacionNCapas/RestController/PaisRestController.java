@@ -19,7 +19,7 @@ public class PaisRestController {
     Result result = new Result();
 
     // Pais
-    @GetMapping("/pais")
+    @GetMapping()
     public ResponseEntity GetAllPais() {
 
         try {

@@ -20,7 +20,7 @@ public class RolRestController {
     Result result = new Result();
 
     //    Rol
-    @GetMapping("/rol")
+    @GetMapping()
     public ResponseEntity GetAllRol() {
 
         try {

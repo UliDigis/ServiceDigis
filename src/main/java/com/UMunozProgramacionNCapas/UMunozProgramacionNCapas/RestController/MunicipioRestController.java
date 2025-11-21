@@ -20,7 +20,7 @@ public class MunicipioRestController {
     Result result = new Result();
 
     //    Municipio
-    @GetMapping("/municipio/")
+    @GetMapping("/estado")
     public ResponseEntity GetByEstado(@RequestParam("IdEstado") int IdEstado) {
 
         try {

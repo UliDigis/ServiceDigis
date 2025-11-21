@@ -20,7 +20,7 @@ public class EstadoRestController {
     Result result = new Result();
 
     // Estado
-    @GetMapping("/estado/")
+    @GetMapping("/pais")
     public ResponseEntity GetByPais(@RequestParam("IdPais") int IdPais) {
 
         try {

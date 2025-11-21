@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 @RequestMapping("api/colonia")
 public class ColoniaRestController {
@@ -21,7 +20,7 @@ public class ColoniaRestController {
     Result result = new Result();
 
     // Colonia
-    @GetMapping("/colonia/")
+    @GetMapping("/municipio")
     public ResponseEntity GetByMunicipio(@RequestParam("IdMunicipio") int IdMunicipio) {
 
         try {
@@ -40,6 +39,24 @@ public class ColoniaRestController {
 
     }
 
-    // Colonia
+    @GetMapping("/codigoPostal")
+    public ResponseEntity GetByCodigoPostal(@RequestParam("idColonia") int IdColonia) {
 
+        try {
+
+            result = coloniaJPADAOImplementation.GetByCodigoPostal(IdColonia);
+            result.correct = true;
+            result.status = 200;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.ex = ex;
+            result.status = 500;
+        }
+
+        return ResponseEntity.status(result.status).body(result);
+    }
+
+    // Colonia
 }

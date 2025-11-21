@@ -1,9 +1,9 @@
 package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA;
 
 // import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
@@ -19,22 +19,22 @@ public class DireccionJPA {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "iddireccion")
     private int IdDireccion;
-    
+
     @Column(name = "calle", nullable = false, unique = false)
     private String Calle;
-    
+
     @Column(name = "numerointerior", nullable = false, unique = false)
     private String NumeroInterior;
-    
+
     @Column(name = "numeroexterior", nullable = true, unique = false)
     private String NumeroExterior;
-    
-    
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "idusuario", nullable = false)
     public UsuarioJPA usuario;
-    
-    @ManyToOne(fetch  = FetchType.LAZY)
+
+    @ManyToOne
     @JoinColumn(name = "idcolonia", nullable = false)
     public ColoniaJPA colonia;
 
@@ -69,23 +69,5 @@ public class DireccionJPA {
     public void setNumeroExterior(String NumeroExterior) {
         this.NumeroExterior = NumeroExterior;
     }
-
-//    public UsuarioJPA getUsuario() {
-//        return usuario;
-//    }
-//
-//    public void setUsuario(UsuarioJPA usuario) {
-//        this.usuario = usuario;
-//    }
-//
-//    public ColoniaJPA getColonia() {
-//        return colonia;
-//    }
-//
-//    public void setColonia(ColoniaJPA colonia) {
-//        this.colonia = colonia;
-//    }
-//    
-    
 
 }
