@@ -84,7 +84,7 @@ public class UsuarioRestController {
     public ResponseEntity<Result> Delete(@RequestParam("IdUsuario") int IdUsuario) {
 
         try {
-            result = usuarioJPADAOImplementation.Delete(IdUsuario);
+            result = usuarioJPADAOImplementation.DeleteUsuario(IdUsuario);
             result.Object = "El usuario fue eliminado correctamente";
             result.correct = true;
             result.status = 200;

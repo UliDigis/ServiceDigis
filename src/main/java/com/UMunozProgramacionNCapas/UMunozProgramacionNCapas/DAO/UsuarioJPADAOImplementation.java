@@ -101,7 +101,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
     @Override
     @Transactional
-    public Result Delete(int IdUsuario) {
+    public Result DeleteUsuario(int IdUsuario) {
         Result result = new Result();
 
         try {
