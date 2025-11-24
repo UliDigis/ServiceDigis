@@ -4,6 +4,7 @@ package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.RolJPA;
 //import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Service.UsuarioMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -98,6 +99,58 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
         return result;
     }
+    
+    @Transactional
+    @Override
+    public Result Update(UsuarioJPA usuarioJPA, int IdUsuario){
+        Result result = new Result();
+        try{
+            
+            UsuarioJPA usuarioDB = entityManager.find(UsuarioJPA.class, IdUsuario);
+            
+            if (usuarioDB == null) {
+                result.correct = false;
+                result.status = 404;
+                result.errorMessage = "Usuario no encontrado";
+                return result;
+            }else{
+                
+                
+                usuarioDB.setUserName(usuarioJPA.getUserName());
+                usuarioDB.setNombre(usuarioJPA.getNombre());
+                usuarioDB.setApellidoPaterno(usuarioJPA.getApellidoPaterno());
+                usuarioDB.setApellidoMaterno(usuarioJPA.getApellidoMaterno());
+                usuarioDB.setEmail(usuarioJPA.getEmail());
+                usuarioDB.setPassword(usuarioJPA.getPassword());
+                usuarioDB.setTelefono(usuarioJPA.getTelefono());
+                usuarioDB.setCelular(usuarioJPA.getCelular());
+                usuarioDB.setCURP(usuarioJPA.getCURP());
+                usuarioDB.setSexo(usuarioJPA.getSexo());
+                usuarioDB.setFechaNacimiento(usuarioJPA.getFechaNacimiento());
+                usuarioDB.setImagen(usuarioJPA.getImagen());
+                
+                if (usuarioJPA.rol != null && usuarioJPA.rol.getIdRol() > 0) {
+                    usuarioDB.rol = entityManager.getReference(
+                            RolJPA.class,
+                            usuarioJPA.rol.getIdRol()
+                    );
+                }
+                
+                entityManager.merge(usuarioDB);
+                result.correct = true;
+                result.status = 200;
+
+            }
+            
+        }catch(Exception ex){
+            result.correct = false;
+            result.status = 500;
+            result.errorMessage = ex.getMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+    
 
     @Override
     @Transactional

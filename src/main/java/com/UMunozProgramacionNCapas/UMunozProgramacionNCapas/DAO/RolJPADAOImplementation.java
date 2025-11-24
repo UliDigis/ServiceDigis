@@ -39,5 +39,29 @@ public class RolJPADAOImplementation implements IRolJPA {
 
         return result;
     }
+    
+    @Override
+    public Result GetById(int idRol) {
+        Result result = new Result();
+
+        try {
+            RolJPA rol = entityManager.find(RolJPA.class, idRol);
+
+            if (rol != null) {
+                result.Object = rol;
+                result.correct = true;
+            } else {
+                result.correct = false;
+                result.errorMessage = "No se encontró el Rol con Id: " + idRol;
+            }
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
 
 }

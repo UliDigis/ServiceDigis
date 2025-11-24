@@ -6,4 +6,6 @@ public interface IRolJPA {
 
     Result GetAll();
     
+    Result GetById(int IdRol);
+    
 }
