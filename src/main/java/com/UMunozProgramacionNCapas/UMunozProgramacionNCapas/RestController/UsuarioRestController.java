@@ -2,6 +2,7 @@ package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.RestController;
 
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO.RolJPADAOImplementation;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO.UsuarioJPADAOImplementation;
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
 
@@ -86,6 +87,21 @@ public class UsuarioRestController {
         return ResponseEntity.status(result.status).body(result);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Result> SearchUsuarios(@RequestParam(required = false) String nombre, @RequestParam(required = false) String apellidoPaterno, @RequestParam(required = false) String apellidoMaterno, @RequestParam(required = false) Integer idRol) {
+        Result result = new Result();
+        try {
+            result = usuarioJPADAOImplementation.searchUsuario(nombre, apellidoPaterno, apellidoMaterno, idRol);
+            result.correct = true;
+            result.status = 200;
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.status = 500;
+        }
+        return ResponseEntity.status(result.status).body(result);
+    }
+
     @PutMapping("/update/{IdUsuario}")
     public ResponseEntity<Result> UpdateUsuario(@RequestBody UsuarioJPA usuarioJPA,
             @PathVariable("IdUsuario") int IdUsuario) {
@@ -108,6 +124,8 @@ public class UsuarioRestController {
             }
 
             result = usuarioJPADAOImplementation.Update(usuarioJPA, IdUsuario);
+            result.correct = true;
+            result.status = 200;
 
         } catch (Exception ex) {
             result.correct = false;
@@ -119,6 +137,26 @@ public class UsuarioRestController {
         return ResponseEntity.status(result.status).body(result);
     }
 
+    @PutMapping("/{IdUsuario}/direccion/{IdDireccion}")
+    public ResponseEntity<Result> UpdateDireccion(@PathVariable("IdUsuario") int IdUsuario,
+            @PathVariable("IdDireccion") int IdDireccion,
+            @RequestBody DireccionJPA direccionJPA) {
+
+        try {
+
+            result = usuarioJPADAOImplementation.UpdateDireccion(direccionJPA, IdUsuario, IdDireccion);
+            result.correct = true;
+            result.status = 200;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.ex = ex;
+            result.status = 500;
+        }
+
+        return ResponseEntity.status(result.status).body(result);
+    }
 
     @DeleteMapping("/delete")
     public ResponseEntity<Result> Delete(@RequestParam("IdUsuario") int IdUsuario) {

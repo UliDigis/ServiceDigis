@@ -4,7 +4,11 @@ package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.ColoniaJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.RolJPA;
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.MunicipioJPA;
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.EstadoJPA;
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.PaisJPA;
 //import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Service.UsuarioMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -16,8 +20,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Repository;
-// import org.springframework.transaction.annotation.Transactional;
 
+// import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
@@ -99,23 +103,22 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
         return result;
     }
-    
+
     @Transactional
     @Override
-    public Result Update(UsuarioJPA usuarioJPA, int IdUsuario){
+    public Result Update(UsuarioJPA usuarioJPA, int IdUsuario) {
         Result result = new Result();
-        try{
-            
+        try {
+
             UsuarioJPA usuarioDB = entityManager.find(UsuarioJPA.class, IdUsuario);
-            
+
             if (usuarioDB == null) {
                 result.correct = false;
                 result.status = 404;
                 result.errorMessage = "Usuario no encontrado";
                 return result;
-            }else{
-                
-                
+            } else {
+
                 usuarioDB.setUserName(usuarioJPA.getUserName());
                 usuarioDB.setNombre(usuarioJPA.getNombre());
                 usuarioDB.setApellidoPaterno(usuarioJPA.getApellidoPaterno());
@@ -128,21 +131,21 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 usuarioDB.setSexo(usuarioJPA.getSexo());
                 usuarioDB.setFechaNacimiento(usuarioJPA.getFechaNacimiento());
                 usuarioDB.setImagen(usuarioJPA.getImagen());
-                
+
                 if (usuarioJPA.rol != null && usuarioJPA.rol.getIdRol() > 0) {
                     usuarioDB.rol = entityManager.getReference(
                             RolJPA.class,
                             usuarioJPA.rol.getIdRol()
                     );
                 }
-                
+
                 entityManager.merge(usuarioDB);
                 result.correct = true;
                 result.status = 200;
 
             }
-            
-        }catch(Exception ex){
+
+        } catch (Exception ex) {
             result.correct = false;
             result.status = 500;
             result.errorMessage = ex.getMessage();
@@ -150,7 +153,72 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         }
         return result;
     }
-    
+
+    @Override
+    @Transactional
+    public Result UpdateDireccion(DireccionJPA direccionJPA, int IdUsuario, int IdDireccion) {
+        Result result = new Result();
+
+        try {
+            UsuarioJPA usuarioDB = entityManager.find(UsuarioJPA.class, IdUsuario);
+            if (usuarioDB == null) {
+                result.correct = false;
+                result.status = 400;
+                result.errorMessage = "Usuario no encontrado";
+                return result;
+            }
+
+            DireccionJPA direccionDB = entityManager.find(DireccionJPA.class, IdDireccion);
+            if (direccionDB == null) {
+                result.correct = false;
+                result.status = 400;
+                result.errorMessage = "Dirección no encontrada";
+                return result;
+            }
+
+            if (direccionDB.usuario.getIdUsuario() != IdUsuario) {
+                result.correct = false;
+                result.status = 400;
+                result.errorMessage = "La dirección no pertenece al usuario especificado";
+                return result;
+            }
+
+            direccionDB.setCalle(direccionJPA.getCalle());
+            direccionDB.setNumeroInterior(direccionJPA.getNumeroInterior());
+            direccionDB.setNumeroExterior(direccionJPA.getNumeroExterior());
+
+            if (direccionDB.colonia != null) {
+                direccionDB.colonia.setNombre(direccionJPA.colonia.getNombre());
+                direccionDB.colonia.setCodigoPostal(direccionJPA.colonia.getCodigoPostal());
+
+                if (direccionDB.colonia.municipio != null) {
+                    direccionDB.colonia.municipio.setNombre(direccionJPA.colonia.municipio.getNombre());
+
+                    if (direccionDB.colonia.municipio.estado != null) {
+                        direccionDB.colonia.municipio.estado.setNombre(direccionJPA.colonia.municipio.estado.getNombre());
+
+                        if (direccionDB.colonia.municipio.estado.pais != null) {
+                            direccionDB.colonia.municipio.estado.pais.setNombre(direccionJPA.colonia.municipio.estado.pais.getNombre());
+                        }
+                    }
+                }
+            }
+
+            entityManager.merge(direccionDB);
+
+            result.correct = true;
+            result.status = 200;
+            result.Object = "Dirección actualizada correctamente";
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.status = 500;
+            result.errorMessage = ex.getMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
 
     @Override
     @Transactional
@@ -193,6 +261,55 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
             result.status = 500;
         }
 
+        return result;
+    }
+
+    @Override
+    public Result searchUsuario(String nombre, String apellidoPaterno, String apellidoMaterno, Integer idRol) {
+        Result result = new Result();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT u FROM UsuarioJPA u LEFT JOIN FETCH u.rol WHERE 1=1");
+
+            if (nombre != null && !nombre.trim().isEmpty()) {
+                jpql.append(" AND LOWER(u.Nombre) LIKE LOWER(:nombre)");
+            }
+            if (apellidoPaterno != null && !apellidoPaterno.trim().isEmpty()) {
+                jpql.append(" AND LOWER(u.ApellidoPaterno) LIKE LOWER(:apellidoPaterno)");
+            }
+            if (apellidoMaterno != null && !apellidoMaterno.trim().isEmpty()) {
+                jpql.append(" AND LOWER(u.ApellidoMaterno) LIKE LOWER(:apellidoMaterno)");
+            }
+            if (idRol != null && idRol > 0) {
+                jpql.append(" AND u.rol.idRol = :idRol");
+            }
+
+            TypedQuery<UsuarioJPA> query = entityManager.createQuery(jpql.toString(), UsuarioJPA.class);
+
+            if (nombre != null && !nombre.trim().isEmpty()) {
+                query.setParameter("nombre", "%" + nombre.trim() + "%");
+            }
+            if (apellidoPaterno != null && !apellidoPaterno.trim().isEmpty()) {
+                query.setParameter("apellidoPaterno", "%" + apellidoPaterno.trim() + "%");
+            }
+            if (apellidoMaterno != null && !apellidoMaterno.trim().isEmpty()) {
+                query.setParameter("apellidoMaterno", "%" + apellidoMaterno.trim() + "%");
+            }
+            if (idRol != null && idRol > 0) {
+                query.setParameter("idRol", idRol);
+            }
+
+            List<UsuarioJPA> usuarios = query.getResultList();
+
+            result.Object = usuarios;
+            result.correct = true;
+            result.status = 200;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.status = 500;
+            result.ex = ex;
+        }
         return result;
     }
     // @Override

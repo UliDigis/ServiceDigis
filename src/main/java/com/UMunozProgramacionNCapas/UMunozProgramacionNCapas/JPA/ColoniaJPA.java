@@ -26,7 +26,7 @@ public class ColoniaJPA {
 
     @ManyToOne
     @JoinColumn(name = "idmunicipio", nullable = false)
-    private MunicipioJPA municipio;
+    public MunicipioJPA municipio;
 
     public int getIdColonia() {
         return IdColonia;
