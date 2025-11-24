@@ -10,6 +10,6 @@ public interface IDireccion {
     
     Result DeleteDireccion(int IdDireccion);
     
-    Result AddDireccion(DireccionJPA direccionJPA);
+    Result AddDireccion(DireccionJPA direccionJPA,int IdUsuario);
     
 }

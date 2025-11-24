@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,12 +56,12 @@ public class DireccionRestController {
         return ResponseEntity.status(result.status).body(result);
     }
     
-    @PostMapping("add")
-    public ResponseEntity<Result> AddDireccion(@RequestBody DireccionJPA direccionJPA){
+    @PostMapping("/add/{IdUsuario}")
+    public ResponseEntity<Result> AddDireccion(@RequestBody DireccionJPA direccionJPA, @PathVariable("IdUsuario") int IdUsuario){
         
         try{
             
-            result = direccionJPADAOImplementation.AddDireccion(direccionJPA);
+            result = direccionJPADAOImplementation.AddDireccion(direccionJPA, IdUsuario);
             result.correct = true;
             result.status = 202;
             
