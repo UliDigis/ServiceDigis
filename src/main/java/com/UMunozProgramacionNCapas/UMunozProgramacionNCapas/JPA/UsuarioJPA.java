@@ -67,6 +67,9 @@ public class UsuarioJPA {
     @JoinColumn(name = "idrol", nullable = false)
     public RolJPA rol;
     
+    @Column(name = "status", nullable = false)
+    private boolean Status;
+    
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<DireccionJPA> Direcciones;
@@ -175,6 +178,15 @@ public class UsuarioJPA {
         this.Imagen = Imagen;
     }
 
+    public boolean isStatus() {
+        return Status;
+    }
+
+    public void setStatus(boolean Status) {
+        this.Status = Status;
+    }
+
+    
     
 
 }
