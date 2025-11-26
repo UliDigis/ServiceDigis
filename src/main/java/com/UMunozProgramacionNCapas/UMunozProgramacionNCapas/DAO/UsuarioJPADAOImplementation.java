@@ -8,6 +8,7 @@ import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.ColoniaJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.RolJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.MunicipioJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.EstadoJPA;
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.PaisJPA;
 //import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Service.UsuarioMapper;
 import jakarta.persistence.EntityManager;
@@ -54,21 +55,29 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
     @Transactional
     @Override
-    public Result Add(UsuarioJPA usuario) {
+    public Result Add(UsuarioJPA usuarioJPA) {
         Result result = new Result();
 
         try {
 
-            if (usuario == null) {
+            if (usuarioJPA == null) {
                 result.correct = false;
                 result.errorMessage = "El usuario llego vacio o hubo un problema";
                 result.status = 400;
             } else {
 
-                entityManager.persist(usuario);
+                if (usuarioJPA.Direcciones == null || usuarioJPA.Direcciones.isEmpty()) {
+                    entityManager.persist(usuarioJPA);
+                    result.correct = true;
+                    result.status = 201;
+                } else {
+                    usuarioJPA.Direcciones.get(0).setUsuario(usuarioJPA);
+                    entityManager.merge(usuarioJPA);
+                    result.Object = usuarioJPA.getIdUsuario();
 
-                result.correct = true;
-                result.status = 201;
+                    result.correct = true;
+                    result.status = 201;
+                }
             }
 
         } catch (Exception ex) {
@@ -85,18 +94,17 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         Result result = new Result();
 
         try {
-            TypedQuery<UsuarioJPA> query = entityManager.createQuery("FROM UsuarioJPA u WHERE u.IdUsuario = :IdUsuario",
-                    UsuarioJPA.class);
-            query.setParameter("IdUsuario", IdUsuario);
-            
             //
-            UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, IdUsuario);
-
-            List<UsuarioJPA> usuarioJPA = query.getResultList();
-
-            result.Object = usuario;
-
+            UsuarioJPA usuarioJPA = entityManager.find(UsuarioJPA.class, IdUsuario);
+            result.Object = usuarioJPA;
             result.correct = true;
+
+            if(usuarioJPA != null){
+                result.status = 200;
+            } else {
+                result.status = 404;    
+                result.errorMessage = "Usuario no encontrado";
+            }
 
         } catch (Exception ex) {
             result.correct = false;
@@ -138,8 +146,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 if (usuarioJPA.rol != null && usuarioJPA.rol.getIdRol() > 0) {
                     usuarioDB.rol = entityManager.getReference(
                             RolJPA.class,
-                            usuarioJPA.rol.getIdRol()
-                    );
+                            usuarioJPA.rol.getIdRol());
                 }
 
                 entityManager.merge(usuarioDB);
@@ -198,10 +205,12 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                     direccionDB.colonia.municipio.setNombre(direccionJPA.colonia.municipio.getNombre());
 
                     if (direccionDB.colonia.municipio.estado != null) {
-                        direccionDB.colonia.municipio.estado.setNombre(direccionJPA.colonia.municipio.estado.getNombre());
+                        direccionDB.colonia.municipio.estado
+                                .setNombre(direccionJPA.colonia.municipio.estado.getNombre());
 
                         if (direccionDB.colonia.municipio.estado.pais != null) {
-                            direccionDB.colonia.municipio.estado.pais.setNombre(direccionJPA.colonia.municipio.estado.pais.getNombre());
+                            direccionDB.colonia.municipio.estado.pais
+                                    .setNombre(direccionJPA.colonia.municipio.estado.pais.getNombre());
                         }
                     }
                 }

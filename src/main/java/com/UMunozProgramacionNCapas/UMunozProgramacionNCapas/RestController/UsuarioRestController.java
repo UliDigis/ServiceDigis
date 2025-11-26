@@ -6,14 +6,18 @@ import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
 
+import java.util.Base64;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,11 +72,18 @@ public class UsuarioRestController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Result> Add(@RequestBody UsuarioJPA Usuario) {
+    public ResponseEntity<Result> Add(@RequestBody UsuarioJPA usuarioJPA) {
 
         try {
 
-            result = usuarioJPADAOImplementation.Add(Usuario);
+            if(usuarioJPA == null){
+                result.correct = false;
+                result.errorMessage = "El usuario llego vacio o hubo un problema";
+                result.status = 400;
+                return ResponseEntity.status(result.status).body(result);
+            }
+
+            result = usuarioJPADAOImplementation.Add(usuarioJPA);
             result.Object = "El usuario fue registrado correctamente";
             result.correct = true;
             result.status = 201;
@@ -88,7 +99,9 @@ public class UsuarioRestController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Result> SearchUsuarios(@RequestParam(required = false) String nombre, @RequestParam(required = false) String apellidoPaterno, @RequestParam(required = false) String apellidoMaterno, @RequestParam(required = false) Integer idRol) {
+    public ResponseEntity<Result> SearchUsuarios(@RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String apellidoPaterno,
+            @RequestParam(required = false) String apellidoMaterno, @RequestParam(required = false) Integer idRol) {
         Result result = new Result();
         try {
             result = usuarioJPADAOImplementation.searchUsuario(nombre, apellidoPaterno, apellidoMaterno, idRol);
