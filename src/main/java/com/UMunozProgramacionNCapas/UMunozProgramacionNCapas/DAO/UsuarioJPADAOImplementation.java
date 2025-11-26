@@ -88,10 +88,13 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
             TypedQuery<UsuarioJPA> query = entityManager.createQuery("FROM UsuarioJPA u WHERE u.IdUsuario = :IdUsuario",
                     UsuarioJPA.class);
             query.setParameter("IdUsuario", IdUsuario);
+            
+            //
+            UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, IdUsuario);
 
             List<UsuarioJPA> usuarioJPA = query.getResultList();
 
-            result.Object = usuarioJPA;
+            result.Object = usuario;
 
             result.correct = true;
 
@@ -118,7 +121,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 result.errorMessage = "Usuario no encontrado";
                 return result;
             } else {
-
+                usuarioJPA.setPassword((usuarioDB.getPassword()));
                 usuarioDB.setUserName(usuarioJPA.getUserName());
                 usuarioDB.setNombre(usuarioJPA.getNombre());
                 usuarioDB.setApellidoPaterno(usuarioJPA.getApellidoPaterno());

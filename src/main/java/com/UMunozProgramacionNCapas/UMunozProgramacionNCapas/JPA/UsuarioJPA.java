@@ -12,6 +12,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -42,10 +43,8 @@ public class UsuarioJPA {
 
     @Column(name = "password", nullable = false, unique = false, length = 50)
     private String Password;
-    
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "fechanacimiento", nullable = false, unique = false)
-    private Date FechaNacimiento;
+    private LocalDate FechaNacimiento;
 
     @Column(name = "sexo", nullable = false, unique = false, length = 1)
     private char Sexo;
@@ -56,7 +55,7 @@ public class UsuarioJPA {
     @Column(name = "celular", nullable = true, unique = false, length = 20)
     private String Celular;
 
-    @Column(name = "curp", nullable = false, unique = true, length = 30)
+    @Column(name = "CURP", nullable = false, unique = true, length = 30)
     private String CURP;
     
     @Lob
@@ -130,11 +129,11 @@ public class UsuarioJPA {
         this.Password = Password;
     }
 
-    public Date getFechaNacimiento() {
+    public LocalDate getFechaNacimiento() {
         return FechaNacimiento;
     }
 
-    public void setFechaNacimiento(Date FechaNacimiento) {
+    public void setFechaNacimiento(LocalDate FechaNacimiento) {
         this.FechaNacimiento = FechaNacimiento;
     }
 

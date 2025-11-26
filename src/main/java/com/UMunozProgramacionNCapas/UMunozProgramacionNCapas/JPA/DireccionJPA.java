@@ -40,16 +40,6 @@ public class DireccionJPA {
     @JoinColumn(name = "idcolonia", nullable = false)
     public ColoniaJPA colonia;
 
-    // @JsonProperty("IdUsuario")
-    // public Integer getIdUsuario() {
-    //     if (this.usuario == null) return null;
-    //     try {
-    //         return this.usuario.getIdUsuario();
-    //     } catch (Exception ex) {
-    //         return null;
-    //     }
-    // }
-
     public int getIdDireccion() {
         return IdDireccion;
     }
@@ -82,4 +72,22 @@ public class DireccionJPA {
         this.NumeroExterior = NumeroExterior;
     }
 
+    public UsuarioJPA getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(UsuarioJPA usuario) {
+        this.usuario = usuario;
+    }
+
+    public ColoniaJPA getColonia() {
+        return colonia;
+    }
+
+    public void setColonia(ColoniaJPA colonia) {
+        this.colonia = colonia;
+    }
+
+    
+    
 }
