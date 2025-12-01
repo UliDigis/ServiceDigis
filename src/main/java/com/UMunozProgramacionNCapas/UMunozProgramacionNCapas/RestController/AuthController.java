@@ -1,6 +1,8 @@
 package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.RestController;
 
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,29 +17,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api")
-public class AuthController {  
+public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    Result result = new Result();
-
     @PostMapping("/login")
-    public ResponseEntity<Result> Login(@RequestBody LoginRequest loginRequest) {
-
+    public ResponseEntity<Result> Login(@RequestBody UsuarioJPA usuario) {
+        Result result = new Result();
+        
         try {
-
-            if (loginRequest == null || loginRequest.userName == null || loginRequest.password == null) {
+            if (usuario == null || usuario.getUserName() == null || usuario.getPassword() == null) {
                 result.correct = false;
-                result.errorMessage = "Las credenciales llegaron vacías o hubo un problema";
+                result.errorMessage = "Las credenciales llegaron vacías";
                 result.status = 400;
                 return ResponseEntity.status(result.status).body(result);
             }
 
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                    loginRequest.userName,
-                    loginRequest.password
+                    usuario.getUserName(),
+                    usuario.getPassword()
                 )
             );
 
@@ -47,11 +47,7 @@ public class AuthController {
             result.correct = true;
             result.status = 200;
 
-        } catch (BadCredentialsException ex) {
-            result.correct = false;
-            result.errorMessage = "Credenciales inválidas";
-            result.status = 401;
-        } catch (Exception ex) {
+        }  catch (Exception ex) {
             result.correct = false;
             result.errorMessage = ex.getMessage();
             result.ex = ex;
@@ -61,8 +57,4 @@ public class AuthController {
         return ResponseEntity.status(result.status).body(result);
     }
 
-    public static class LoginRequest {
-        public String userName;
-        public String password;
-    }
 }
