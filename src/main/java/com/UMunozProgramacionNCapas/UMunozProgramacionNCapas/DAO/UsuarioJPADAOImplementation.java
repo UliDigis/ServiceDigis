@@ -1,28 +1,18 @@
 package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO;
 
-//import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
-import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.ColoniaJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.RolJPA;
-import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.MunicipioJPA;
-import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.EstadoJPA;
-import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
-import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.PaisJPA;
-//import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Service.UsuarioMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
-
-// import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Repository;
 
-// import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
@@ -30,7 +20,6 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     private EntityManager entityManager;
 
     @Autowired
-    // private UsuarioMapper usuarioMapper;
 
     @Override
     public Result GetAllJPA() {
