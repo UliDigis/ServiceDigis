@@ -7,8 +7,7 @@ public class Result {
 
     public boolean correct;
     public String errorMessage;
-    public Exception ex;
-    public Object Object;
+    public Exception ex;public Object Object;
     public List<Object> Objects;
     
     @JsonIgnore

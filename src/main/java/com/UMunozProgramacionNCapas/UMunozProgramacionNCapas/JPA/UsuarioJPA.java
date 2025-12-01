@@ -184,10 +184,4 @@ public class UsuarioJPA {
     public void setStatus(boolean Status) {
         this.Status = Status;
     }
-
-    
-
-    
-    
-
 }
