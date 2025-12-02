@@ -64,7 +64,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             result.Object = "Error: No se pudo autentificar el usuario" + ex.getMessage();
         }
         filterChain.doFilter(request, response);
-    }
+        }
 
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");

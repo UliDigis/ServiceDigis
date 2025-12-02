@@ -1,87 +1,103 @@
 package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.RestController;
 
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO.IUsuarioRepositoryDAO;
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.LoginDTO;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Security.JwtUtil;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api")
+@RequestMapping("/api")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final IUsuarioRepositoryDAO iUsuarioRepositoryDAO;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private IUsuarioRepositoryDAO iUsuarioRepositoryDAO;
-
-    @Autowired
-    private JwtUtil jwtUtil;
+    public AuthController(AuthenticationManager authenticationManager,
+                          IUsuarioRepositoryDAO iUsuarioRepositoryDAO,
+                          JwtUtil jwtUtil) {
+        this.authenticationManager = authenticationManager;
+        this.iUsuarioRepositoryDAO = iUsuarioRepositoryDAO;
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<Result> Login(@RequestBody UsuarioJPA usuario) {
+    public ResponseEntity<Result> Login(@RequestBody LoginDTO loginRequest) {
         Result result = new Result();
 
-        if (usuario == null || usuario.getUserName() == null || usuario.getPassword() == null) {
-            result.correct = false;
-            result.errorMessage = "Faltan credenciales o el usuario esta desavilitado(usuario o contraseña).";
-            result.status = 400;
-            return ResponseEntity.status(result.status).body(result);
-        }
-
         try {
+            if (loginRequest.getUserName() == null || loginRequest.getPassword() == null) {
+                throw new BadCredentialsException("Faltan credenciales.");
+            }
 
+            
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            usuario.getUserName(),
-                            usuario.getPassword()
+                            loginRequest.getUserName(),
+                            loginRequest.getPassword()
                     )
             );
 
-            UsuarioJPA usuarioBD = iUsuarioRepositoryDAO.findByUserName(usuario.getUserName());
-
-            if (usuarioBD.isStatus() == false) {
+            UsuarioJPA usuarioBD = iUsuarioRepositoryDAO.findByUserName(loginRequest.getUserName());
+            if (usuarioBD != null && !usuarioBD.isStatus()) {
                 result.correct = false;
-                result.status = 403; 
-                result.errorMessage = "Usuario inactivo, no puede iniciar sesión.";
-                return ResponseEntity.status(result.status).body(result);
+                result.errorMessage = "Usuario inactivo.";
+                return ResponseEntity.status(403).body(result);
             }
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-            String rolUsuario = userDetails.getAuthorities()
-                    .stream()
-                    .map(auth -> auth.getAuthority())
+            
+            String rolUsuario = userDetails.getAuthorities().stream()
                     .findFirst()
-                    .orElse("Sin_Rol");
+                    .map(item -> item.getAuthority())
+                    .orElse("ROLE_USER");
 
-            String token = jwtUtil.GenerateToken(userDetails.getUsername(), rolUsuario );
+            String token = jwtUtil.GenerateToken(userDetails.getUsername(), rolUsuario);
 
-            result.Object = "Login exitoso. Usuario: " + usuario.getUserName() + " Su token generado es:" + token + " Sus rol es:" + rolUsuario;
+            
+            
+            String urlDestino = "/"; // Default
+            
+            if (rolUsuario.equals("ROLE_Administrador")) {
+                urlDestino = "/usuario"; 
+            } else if (rolUsuario.equals("ROLE_Cliente")) {
+                urlDestino = "api/usuario/?id=" + usuarioBD.getIdUsuario(); 
+            } else if (rolUsuario.equals("ROLE_Usuario")) {
+                urlDestino = "api/usuario/?id=" + usuarioBD.getIdUsuario();
+            }
+
+            LoginDTO responseDTO = new LoginDTO();
+            responseDTO.setToken(token);
+            responseDTO.setRole(rolUsuario);
+            responseDTO.setUserName(userDetails.getUsername());
+            
+            responseDTO.setRedirectUrl(urlDestino); 
+
+            result.Object = responseDTO;
             result.correct = true;
-            result.status = 200;
+            result.errorMessage = "Login Exitoso";
 
-        } catch (Exception ex){
+            return ResponseEntity.ok(result);
+
+        } catch (BadCredentialsException e) {
             result.correct = false;
-            result.errorMessage = "Error interno del servidor durante el login.";
-            result.status = 500;
-            result.ex = ex;
-        }
+            result.errorMessage = "Usuario o contraseña incorrectos.";
+            return ResponseEntity.status(401).body(result);
 
-        return ResponseEntity.status(result.status).body(result);
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = "Error interno: " + ex.getMessage();
+            result.ex = ex;
+            return ResponseEntity.status(500).body(result);
+        }
     }
 }
