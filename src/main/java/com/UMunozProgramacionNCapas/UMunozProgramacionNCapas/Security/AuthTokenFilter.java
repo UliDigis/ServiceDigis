@@ -42,16 +42,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
 
             if (jwt != null) {
-                System.out.println("Validando token...");
 
                 if (jwtUtil.validateJwtToken(jwt)) {
-                    System.out.println("Token válido");
 
                     String username = jwtUtil.getUsernameFromToken(jwt);
-                    System.out.println("Username del token: " + username);
 
                     UserDetails userDetails = userDetailsJPAService.loadUserByUsername(username);
-                    System.out.println("UserDetails cargado: " + userDetails.getUsername());
 
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -61,12 +57,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    System.out.println("Autenticación establecida correctamente");
-                } else {
-                    System.out.println("Token inválido o expirado");
                 }
-            } else {
-                System.out.println("No se encontró token en el header");
             }
 
         } catch (Exception ex) {
@@ -82,12 +73,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
 
-        System.out.println("Authorization header completo: " + headerAuth);
-
         if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
             String token = headerAuth.substring(7);
-            System.out.println("Token extraído (primeros 20 chars): " +
-                    (token.length() > 20 ? token.substring(0, 20) + "..." : token));
             return token;
         }
 
