@@ -21,7 +21,7 @@ public class EstadoRestController {
 
     // Estado
     @GetMapping("/pais")
-    public ResponseEntity GetByPais(@RequestParam("IdPais") int IdPais) {
+    public ResponseEntity<Result> GetByPais(@RequestParam("IdPais") int IdPais) {
 
         try {
             result = estadoJPADAOImplementation.GetByPais(IdPais);

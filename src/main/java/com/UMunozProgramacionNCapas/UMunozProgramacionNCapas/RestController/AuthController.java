@@ -11,6 +11,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,8 +23,8 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     public AuthController(AuthenticationManager authenticationManager,
-                          IUsuarioRepositoryDAO iUsuarioRepositoryDAO,
-                          JwtUtil jwtUtil) {
+            IUsuarioRepositoryDAO iUsuarioRepositoryDAO,
+            JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.iUsuarioRepositoryDAO = iUsuarioRepositoryDAO;
         this.jwtUtil = jwtUtil;
@@ -38,13 +39,10 @@ public class AuthController {
                 throw new BadCredentialsException("Faltan credenciales.");
             }
 
-            
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUserName(),
-                            loginRequest.getPassword()
-                    )
-            );
+                            loginRequest.getPassword()));
 
             UsuarioJPA usuarioBD = iUsuarioRepositoryDAO.findByUserName(loginRequest.getUserName());
             if (usuarioBD != null && !usuarioBD.isStatus()) {
@@ -55,7 +53,6 @@ public class AuthController {
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-            
             String rolUsuario = userDetails.getAuthorities().stream()
                     .findFirst()
                     .map(item -> item.getAuthority())
@@ -63,28 +60,21 @@ public class AuthController {
 
             String token = jwtUtil.GenerateToken(userDetails.getUsername(), rolUsuario);
 
-            
-            
-            String urlDestino = "/"; // Default
-            
-            if (rolUsuario.equals("ROLE_Administrador")) {
-                urlDestino = "/usuario"; 
-            } else if (rolUsuario.equals("ROLE_Cliente")) {
-                urlDestino = "api/usuario/?id=" + usuarioBD.getIdUsuario(); 
-            } else if (rolUsuario.equals("ROLE_Usuario")) {
-                urlDestino = "api/usuario/?id=" + usuarioBD.getIdUsuario();
-            }
+            String urlDestino = switch (rolUsuario) {
+                case "ROLE_Administrador" -> "/usuario";
+                case "ROLE_Cliente", "ROLE_Usuario" -> "/usuario/detail/?IdUsuario=" + usuarioBD.getIdUsuario();
+                default -> "/login";
+            };
 
             LoginDTO responseDTO = new LoginDTO();
             responseDTO.setToken(token);
             responseDTO.setRole(rolUsuario);
             responseDTO.setUserName(userDetails.getUsername());
-            
-            responseDTO.setRedirectUrl(urlDestino); 
+
+            responseDTO.setRedirectUrl(urlDestino);
 
             result.Object = responseDTO;
             result.correct = true;
-            result.errorMessage = "Login Exitoso";
 
             return ResponseEntity.ok(result);
 

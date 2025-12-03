@@ -13,15 +13,14 @@ import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 @RequestMapping("api/rol")
 public class RolRestController {
 
-
     @Autowired
     private RolJPADAOImplementation rolJPADAOImplementation;
 
     Result result = new Result();
 
-    //    Rol
+    // Rol
     @GetMapping()
-    public ResponseEntity GetAllRol() {
+    public ResponseEntity<Result> GetAllRol() {
 
         try {
             result = rolJPADAOImplementation.GetAll();
@@ -38,7 +37,6 @@ public class RolRestController {
         return ResponseEntity.status(result.status).body(result);
 
     }
-//      Rol
-
+    // Rol
 
 }

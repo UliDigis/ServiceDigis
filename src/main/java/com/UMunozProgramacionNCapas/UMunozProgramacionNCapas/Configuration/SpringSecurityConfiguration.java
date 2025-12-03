@@ -35,56 +35,46 @@ public class SpringSecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            
-            .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/api/usuario/add").permitAll()
 
-            // 3. API SIN ESTADO (No usar cookies de sesión)
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .requestMatchers("/api/usuario").hasAuthority("ROLE_Administrador")
 
-            .authorizeHttpRequests(auth -> auth
-                // Rutas públicas
-                .requestMatchers("/api/login").permitAll()
-                // Rutas protegidas
-                .requestMatchers("/usuario/**").hasRole("Administrador")
-                .requestMatchers("/usuario/detail/**").hasAnyRole("Administrador", "Cliente", "Usuario")
-                .anyRequest().authenticated()
-            )
+                        .anyRequest().authenticated())
 
-            // 4. ELIMINAR EL LOGIN HTML (Esto arregla el error de Thymeleaf "TemplateInputException")
-            .formLogin(form -> form.disable())
-            .logout(logout -> logout.disable())
+                .formLogin(form -> form.disable())
+                .logout(logout -> logout.disable())
 
-            // 5. Manejo de errores: Devolver 401 JSON en vez de redirigir a HTML
-            .exceptionHandling(e -> e.authenticationEntryPoint(
-                (request, response, authException) -> {
-                    response.setContentType("application/json");
-                    response.setStatus(401);
-                    response.getWriter().write("{\"error\": \"No autorizado\"}");
-                }
-            ));
+                .exceptionHandling(e -> e.authenticationEntryPoint(
+                        (request, response, authException) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(401);
+                            response.getWriter().write("{\"error\": \"No autorizado\"}");
+                        }));
 
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // Bean para configurar quién puede conectarse (CORS)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Permite cualquier origen (Frontend en localhost:3000, 4200, etc.)
-        configuration.setAllowedOriginPatterns(List.of("*")); 
+        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

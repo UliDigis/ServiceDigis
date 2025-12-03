@@ -5,19 +5,14 @@ import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO.UsuarioJPADAOIm
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
-
-import java.util.Base64;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +31,7 @@ public class UsuarioRestController {
 
     // Usuario
     @GetMapping
-    public ResponseEntity GetAll() {
+    public ResponseEntity<Result> GetAll() {
 
         try {
             result = usuarioJPADAOImplementation.GetAllJPA();
@@ -54,7 +49,7 @@ public class UsuarioRestController {
     }
 
     @GetMapping("/")
-    public ResponseEntity GetById(@RequestParam("id") int Id) {
+    public ResponseEntity<Result> GetById(@RequestParam("id") int Id) {
 
         try {
             result = usuarioJPADAOImplementation.GetById(Id);
@@ -76,7 +71,7 @@ public class UsuarioRestController {
 
         try {
 
-            if(usuarioJPA == null){
+            if (usuarioJPA == null) {
                 result.correct = false;
                 result.errorMessage = "El usuario llego vacio o hubo un problema";
                 result.status = 400;

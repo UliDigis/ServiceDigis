@@ -20,7 +20,7 @@ public class PaisRestController {
 
     // Pais
     @GetMapping()
-    public ResponseEntity GetAllPais() {
+    public ResponseEntity<Result> GetAllPais() {
 
         try {
             result = paisJPADAOImplementation.GetAll();

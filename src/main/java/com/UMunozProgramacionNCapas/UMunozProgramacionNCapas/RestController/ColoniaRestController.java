@@ -21,7 +21,7 @@ public class ColoniaRestController {
 
     // Colonia
     @GetMapping("/municipio")
-    public ResponseEntity GetByMunicipio(@RequestParam("IdMunicipio") int IdMunicipio) {
+    public ResponseEntity<Result> GetByMunicipio(@RequestParam("IdMunicipio") int IdMunicipio) {
 
         try {
             result = coloniaJPADAOImplementation.GetByMunicipio(IdMunicipio);
@@ -40,7 +40,7 @@ public class ColoniaRestController {
     }
 
     @GetMapping("/codigoPostal")
-    public ResponseEntity GetByCodigoPostal(@RequestParam("idColonia") int IdColonia) {
+    public ResponseEntity<Result> GetByCodigoPostal(@RequestParam("idColonia") int IdColonia) {
 
         try {
 

@@ -19,9 +19,9 @@ public class MunicipioRestController {
 
     Result result = new Result();
 
-    //    Municipio
+    // Municipio
     @GetMapping("/estado")
-    public ResponseEntity GetByEstado(@RequestParam("IdEstado") int IdEstado) {
+    public ResponseEntity<Result> GetByEstado(@RequestParam("IdEstado") int IdEstado) {
 
         try {
             result = municipioJPADAOImplementation.GetByEstado(IdEstado);
@@ -39,6 +39,6 @@ public class MunicipioRestController {
 
     }
 
-//    Municipio
+    // Municipio
 
 }
