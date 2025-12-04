@@ -4,6 +4,7 @@ import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Security.AuthTokenF
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Service.UserDetailsJPAService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,25 +47,36 @@ public class SpringSecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/login").permitAll()
-                        .requestMatchers("/api/usuario/add").permitAll()
-
-                        .requestMatchers("/api/usuario").hasAuthority("ROLE_Administrador")
-
-                        .anyRequest().authenticated())
-
+                
+                .requestMatchers("/api/login", "/login").permitAll()
+                
+                .requestMatchers("/usuario/**").hasAuthority("ROLE_Administrador")
+                .requestMatchers("/usuario/add**").hasAuthority("ROLE_Administrador")
+                
+                .requestMatchers(HttpMethod.POST, "/api/usuario/add").hasAuthority("ROLE_Administrador")
+                .requestMatchers(HttpMethod.DELETE, "/api/usuario/delete").hasAuthority("ROLE_Administrador")
+                .requestMatchers(HttpMethod.GET, "/api/usuario").hasAuthority("ROLE_Administrador")
+                
+                .anyRequest().authenticated()
+                )
                 .formLogin(form -> form.disable())
-                .logout(logout -> logout.disable())
-
+                .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    response.setStatus(200);
+                    response.sendRedirect("/login");
+                })
+                .permitAll()
+                )
                 .exceptionHandling(e -> e.authenticationEntryPoint(
-                        (request, response, authException) -> {
-                            response.setContentType("application/json");
-                            response.setStatus(401);
-                            response.getWriter().write("{\"error\": \"No autorizado\"}");
-                        }));
+                (request, response, authException) -> {
+                    response.setContentType("application/json");
+                    response.setStatus(401);
+                    response.getWriter().write("{\"error\": \"No autorizado (Token inválido o faltante)\"}");
+                }));
 
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 

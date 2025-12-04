@@ -7,6 +7,7 @@ import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("api/usuario")
 public class UsuarioRestController {
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UsuarioJPADAOImplementation usuarioJPADAOImplementation;
@@ -70,6 +74,12 @@ public class UsuarioRestController {
     public ResponseEntity<Result> Add(@RequestBody UsuarioJPA usuarioJPA) {
 
         try {
+            
+            String passEncoder = usuarioJPA.getPassword();
+            
+            String passFinal= passwordEncoder.encode(passEncoder);
+            
+            usuarioJPA.setPassword(passFinal);
 
             if (usuarioJPA == null) {
                 result.correct = false;
