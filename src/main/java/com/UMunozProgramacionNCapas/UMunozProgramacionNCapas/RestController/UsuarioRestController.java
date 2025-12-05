@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("api/usuario")
 public class UsuarioRestController {
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -74,12 +74,6 @@ public class UsuarioRestController {
     public ResponseEntity<Result> Add(@RequestBody UsuarioJPA usuarioJPA) {
 
         try {
-            
-            String passEncoder = usuarioJPA.getPassword();
-            
-            String passFinal= passwordEncoder.encode(passEncoder);
-            
-            usuarioJPA.setPassword(passFinal);
 
             if (usuarioJPA == null) {
                 result.correct = false;
@@ -87,6 +81,12 @@ public class UsuarioRestController {
                 result.status = 400;
                 return ResponseEntity.status(result.status).body(result);
             }
+
+            String passEncoder = usuarioJPA.getPassword();
+
+            String passFinal = passwordEncoder.encode(passEncoder);
+
+            usuarioJPA.setPassword(passFinal);
 
             result = usuarioJPADAOImplementation.Add(usuarioJPA);
             result.Object = "El usuario fue registrado correctamente";

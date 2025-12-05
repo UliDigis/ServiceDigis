@@ -1,8 +1,6 @@
 package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA;
 
-// import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -88,6 +86,4 @@ public class DireccionJPA {
         this.colonia = colonia;
     }
 
-    
-    
 }

@@ -1,6 +1,5 @@
 package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,7 +54,7 @@ public class UsuarioJPA {
 
     @Column(name = "CURP", nullable = false, unique = true, length = 30)
     private String CURP;
-    
+
     @Lob
     @Column(name = "imagen", nullable = true, unique = false)
     private String Imagen;
@@ -63,11 +62,10 @@ public class UsuarioJPA {
     @ManyToOne
     @JoinColumn(name = "idrol", nullable = false)
     public RolJPA rol;
-    
+
     @Column(name = "status", nullable = false)
     private boolean Status;
-    
-    
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<DireccionJPA> Direcciones;
 
