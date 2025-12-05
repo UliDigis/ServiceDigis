@@ -193,6 +193,12 @@ public class UsuarioRestController {
 
         return ResponseEntity.status(result.status).body(result);
     }
+    
+    @PostMapping("/verify/{idUsuairo}")
+    public ResponseEntity<Result> verifyUser(@PathVariable int idUsuario){
+        return ResponseEntity.ok(usuarioJPADAOImplementation.verifyUser(idUsuario));
+    }
+    
 
     // Usuario
 }

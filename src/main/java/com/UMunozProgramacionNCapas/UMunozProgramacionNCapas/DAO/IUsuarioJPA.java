@@ -21,4 +21,6 @@ public interface IUsuarioJPA {
     
     Result searchUsuario(String nombre, String apellidoPaterno, String apellidoMaterno, Integer idRol);
 
+    Result verifyUser(int idUsuario);
+    
 }

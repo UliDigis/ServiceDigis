@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import org.springframework.stereotype.Repository;
 
@@ -88,10 +89,10 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
             result.Object = usuarioJPA;
             result.correct = true;
 
-            if(usuarioJPA != null){
+            if (usuarioJPA != null) {
                 result.status = 200;
             } else {
-                result.status = 404;    
+                result.status = 404;
                 result.errorMessage = "Usuario no encontrado";
             }
 
@@ -313,6 +314,33 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         }
         return result;
     }
+
+    @Override
+    @Transactional
+    public Result verifyUser(int idUsuario) {
+        Result result = new Result();
+
+        try {
+            int rows = entityManager
+                    .createQuery("UPDATE UsuarioJPA u SET u.isVerified = 1 WHERE u.idUsuario = :idUsuario")
+                    .setParameter("idUsuario", idUsuario)
+                    .executeUpdate();
+
+            result.correct = rows > 0;
+
+            if (!result.correct) {
+                result.errorMessage = "No se encontró el usuario.";
+            }
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
+
     // @Override
     // @Transactional
     // public Result AddUsuarioJPA(Usuario usuario) {
@@ -337,5 +365,5 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     //
     // return result;
     // }
-    // son pruebas
+    // 
 }

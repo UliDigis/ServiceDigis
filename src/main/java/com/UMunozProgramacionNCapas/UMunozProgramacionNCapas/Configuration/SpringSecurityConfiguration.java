@@ -51,7 +51,7 @@ public class SpringSecurityConfiguration {
                 
                 .authorizeHttpRequests(auth -> auth
                 
-                .requestMatchers("/api/login", "/login").permitAll()
+                .requestMatchers("/api/login", "/login", "/api/email/send**").permitAll()
                 
                 .requestMatchers("/usuario/**").hasAuthority("ROLE_Administrador")
                 .requestMatchers("/usuario/add**").hasAuthority("ROLE_Administrador")
@@ -62,7 +62,9 @@ public class SpringSecurityConfiguration {
                 
                 .anyRequest().authenticated()
                 )
+                
                 .formLogin(form -> form.disable())
+                
                 .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessHandler((request, response, authentication) -> {

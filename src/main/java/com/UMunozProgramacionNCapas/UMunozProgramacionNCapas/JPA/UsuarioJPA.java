@@ -65,9 +65,13 @@ public class UsuarioJPA {
 
     @Column(name = "status", nullable = false)
     private boolean Status;
+    
+    @Column(name = "isverified", nullable = false)
+    private boolean isVerified;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<DireccionJPA> Direcciones;
+    
 
     public int getIdUsuario() {
         return IdUsuario;
