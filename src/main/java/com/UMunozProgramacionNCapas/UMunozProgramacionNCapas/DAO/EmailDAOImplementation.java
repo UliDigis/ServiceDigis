@@ -17,16 +17,15 @@ public class EmailDAOImplementation implements IEmail {
     public Result SendEmail(String toEmail, String subject, String body) {
         Result result = new Result();
 
-        boolean enviado = emailService.sendEmail(toEmail, subject, body);
+        boolean enviado = emailService.sendHtmlEmail(toEmail, subject, body);
 
         result.correct = enviado;
         result.Object = enviado; 
 
         if (!enviado) {
-            result.errorMessage = "No se pudo mandar el correo";
+            result.errorMessage = "No se pudo mandar el correo (revisar logs para más detalles)";
         }
 
         return result;
     }
-
 }
