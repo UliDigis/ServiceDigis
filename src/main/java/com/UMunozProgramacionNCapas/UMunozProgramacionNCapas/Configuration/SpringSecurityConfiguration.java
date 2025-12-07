@@ -47,39 +47,45 @@ public class SpringSecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                
-                .authorizeHttpRequests(auth -> auth
-                
-                .requestMatchers("/api/login", "/login", "/api/email/send**").permitAll()
-                
-                .requestMatchers("/usuario/**").hasAuthority("ROLE_Administrador")
-                .requestMatchers("/usuario/add**").hasAuthority("ROLE_Administrador")
-                
-                .requestMatchers(HttpMethod.POST, "/api/usuario/add").hasAuthority("ROLE_Administrador")
-                .requestMatchers(HttpMethod.DELETE, "/api/usuario/delete").hasAuthority("ROLE_Administrador")
-                .requestMatchers(HttpMethod.GET, "/api/usuario").hasAuthority("ROLE_Administrador")
-                
-                .anyRequest().authenticated()
-                )
-                
-                .formLogin(form -> form.disable())
-                
-                .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessHandler((request, response, authentication) -> {
-                    response.setStatus(200);
-                    response.sendRedirect("/login");
-                })
-                .permitAll()
-                )
-                .exceptionHandling(e -> e.authenticationEntryPoint(
-                (request, response, authException) -> {
-                    response.setContentType("application/json");
-                    response.setStatus(401);
-                    response.getWriter().write("{\"error\": \"No autorizado (Token inválido o faltante)\"}");
-                }));
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+                .authorizeHttpRequests(auth -> auth
+
+                        // ===== ENDPOINTS PÚBLICOS (SIN TOKEN) =====
+                        .requestMatchers("/api/login", "/login").permitAll()
+                        .requestMatchers("/api/usuario/verify/**").permitAll() // verificación por correo
+                        .requestMatchers("/usuario**").permitAll()          // vista de registro (cliente)
+                        .requestMatchers(HttpMethod.POST, "/api/usuario/add").permitAll() // registrar usuario (REST)
+
+                        // ===== EJEMPLO DE ENDPOINTS PROTEGIDOS =====
+                        // .requestMatchers("/usuario/**").hasAuthority("ROLE_Administrador")
+                        // .requestMatchers("/usuario/add**").hasAuthority("ROLE_Administrador")
+                        // .requestMatchers(HttpMethod.GET, "/api/usuario").hasAuthority("ROLE_Administrador")
+                        .requestMatchers(HttpMethod.DELETE, "/api/usuario/delete").hasAuthority("ROLE_Administrador")
+
+                        // Cualquier otra cosa requiere autenticación
+                        .anyRequest().authenticated()
+                )
+
+                .formLogin(form -> form.disable())
+
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.sendRedirect("/login");
+                        })
+                        .permitAll()
+                )
+
+                .exceptionHandling(e -> e.authenticationEntryPoint(
+                        (request, response, authException) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(401);
+                            response.getWriter().write("{\"error\": \"No autorizado (Token inválido o faltante)\"}");
+                        }));
+
+        // Filtro JWT antes del filtro de login
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -89,7 +95,7 @@ public class SpringSecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
 

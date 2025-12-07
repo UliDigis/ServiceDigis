@@ -5,6 +5,8 @@ import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO.UsuarioJPADAOIm
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
+import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Service.EmailService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class UsuarioRestController {
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -32,6 +37,7 @@ public class UsuarioRestController {
     private RolJPADAOImplementation rolJPADAOImplementation;
 
     Result result = new Result();
+    private static final String baseUrl = "http://localhost:8080";
 
     // Usuario
     @GetMapping
@@ -82,21 +88,24 @@ public class UsuarioRestController {
                 return ResponseEntity.status(result.status).body(result);
             }
 
-            String passEncoder = usuarioJPA.getPassword();
-
-            String passFinal = passwordEncoder.encode(passEncoder);
-
+            String passFinal = passwordEncoder.encode(usuarioJPA.getPassword());
             usuarioJPA.setPassword(passFinal);
 
             result = usuarioJPADAOImplementation.Add(usuarioJPA);
-            result.Object = "El usuario fue registrado correctamente";
-            result.correct = true;
-            result.status = 201;
+
+            if (result.correct) {
+                emailService.sendVerificationEmail(
+                        usuarioJPA.getIdUsuario(),
+                        usuarioJPA.getEmail(),
+                        baseUrl);
+
+                result.Object = "Usuario registrado correctamente. Por favor, verifica tu correo electrónico.";
+                result.status = 201;
+            }
 
         } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = ex.getMessage();
-            result.ex = ex;
             result.status = 500;
         }
 
@@ -193,12 +202,22 @@ public class UsuarioRestController {
 
         return ResponseEntity.status(result.status).body(result);
     }
-    
-    @PostMapping("/verify/{idUsuairo}")
-    public ResponseEntity<Result> verifyUser(@PathVariable int idUsuario){
-        return ResponseEntity.ok(usuarioJPADAOImplementation.verifyUser(idUsuario));
+
+    @GetMapping("/verify/{idUsuario}")
+    public ResponseEntity<Result> VerifyUser(@PathVariable("idUsuario") int idUsuario) {
+        Result result = usuarioJPADAOImplementation.verifyUser(idUsuario);
+
+        if (result.correct) {
+            result.status = 200;
+            result.Object = "Usuario verificado exitosamente.";
+            return ResponseEntity.ok(result);
+        } else {
+            result.status = result.status == 0 ? 500 : result.status;
+            result.Object = "Error al verificar el usuario: " + result.errorMessage;
+            return ResponseEntity.status(result.status).body(result);
+        }
     }
-    
+
 
     // Usuario
 }

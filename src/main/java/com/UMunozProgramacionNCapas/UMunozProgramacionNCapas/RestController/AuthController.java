@@ -44,9 +44,19 @@ public class AuthController {
                             loginRequest.getPassword()));
 
             UsuarioJPA usuarioBD = iUsuarioRepositoryDAO.findByUserName(loginRequest.getUserName());
-            if (usuarioBD != null && !usuarioBD.isStatus()) {
+            if (usuarioBD == null) {
+                throw new BadCredentialsException("Usuario o contraseña incorrectos.");
+            }
+
+            if (!usuarioBD.isStatus()) {
                 result.correct = false;
                 result.errorMessage = "Usuario inactivo.";
+                return ResponseEntity.status(403).body(result);
+            }
+
+            if (!usuarioBD.IsVerified()) {
+                result.correct = false;
+                result.errorMessage = "Cuenta no verificada.";
                 return ResponseEntity.status(403).body(result);
             }
 

@@ -3,7 +3,6 @@ package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.RestController;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO.IEmail;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.EmailRequestDTO;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

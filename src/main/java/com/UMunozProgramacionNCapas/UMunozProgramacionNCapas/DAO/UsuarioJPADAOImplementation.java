@@ -49,26 +49,25 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         Result result = new Result();
 
         try {
-
             if (usuarioJPA == null) {
                 result.correct = false;
-                result.errorMessage = "El usuario llego vacio o hubo un problema";
+                result.errorMessage = "El usuario llegó vacío o hubo un problema";
                 result.status = 400;
-            } else {
-
-                if (usuarioJPA.Direcciones == null || usuarioJPA.Direcciones.isEmpty()) {
-                    entityManager.persist(usuarioJPA);
-                    result.correct = true;
-                    result.status = 201;
-                } else {
-                    usuarioJPA.Direcciones.get(0).setUsuario(usuarioJPA);
-                    entityManager.merge(usuarioJPA);
-                    result.Object = usuarioJPA.getIdUsuario();
-
-                    result.correct = true;
-                    result.status = 201;
-                }
+                return result;
             }
+
+            usuarioJPA.setVerified(false);
+
+            if (usuarioJPA.Direcciones == null || usuarioJPA.Direcciones.isEmpty()) {
+                entityManager.persist(usuarioJPA);
+            } else {
+                usuarioJPA.Direcciones.get(0).setUsuario(usuarioJPA);
+                entityManager.merge(usuarioJPA);
+            }
+
+            result.correct = true;
+            result.status = 201;
+            result.Object = usuarioJPA.getIdUsuario();
 
         } catch (Exception ex) {
             result.correct = false;
@@ -321,8 +320,8 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         Result result = new Result();
 
         try {
-            int rows = entityManager
-                    .createQuery("UPDATE UsuarioJPA u SET u.isVerified = 1 WHERE u.idUsuario = :idUsuario")
+            int rows = entityManager.createQuery(
+                    "UPDATE UsuarioJPA u SET u.Verified = true WHERE u.IdUsuario = :idUsuario")
                     .setParameter("idUsuario", idUsuario)
                     .executeUpdate();
 
@@ -365,5 +364,5 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     //
     // return result;
     // }
-    // 
+    //
 }
