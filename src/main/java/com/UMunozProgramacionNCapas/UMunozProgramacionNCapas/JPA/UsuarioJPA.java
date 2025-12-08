@@ -65,13 +65,12 @@ public class UsuarioJPA {
 
     @Column(name = "status", nullable = false)
     private boolean Status;
-    
+
     @Column(name = "isverified", nullable = false)
     private boolean Verified;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<DireccionJPA> Direcciones;
-    
 
     public int getIdUsuario() {
         return IdUsuario;
@@ -188,8 +187,16 @@ public class UsuarioJPA {
     public boolean IsVerified() {
         return Verified;
     }
-    
+
     public void setVerified(boolean Verified) {
         this.Verified = Verified;
+    }
+
+    public List<DireccionJPA> getDirecciones() {
+        return Direcciones;
+    }
+
+    public void setDirecciones(List<DireccionJPA> Direcciones) {
+        this.Direcciones = Direcciones;
     }
 }

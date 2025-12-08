@@ -39,7 +39,6 @@ public class UsuarioRestController {
     Result result = new Result();
     private static final String baseUrl = "http://localhost:8080";
 
-    // Usuario
     @GetMapping
     public ResponseEntity<Result> GetAll() {
 
@@ -78,29 +77,38 @@ public class UsuarioRestController {
 
     @PostMapping("/add")
     public ResponseEntity<Result> Add(@RequestBody UsuarioJPA usuarioJPA) {
-
+        Result result = new Result();
         try {
-
             if (usuarioJPA == null) {
                 result.correct = false;
-                result.errorMessage = "El usuario llego vacio o hubo un problema";
+                result.errorMessage = "El usuario llegó vacío o hubo un problema";
                 result.status = 400;
                 return ResponseEntity.status(result.status).body(result);
             }
 
-            String passFinal = passwordEncoder.encode(usuarioJPA.getPassword());
-            usuarioJPA.setPassword(passFinal);
+            usuarioJPA.setPassword(passwordEncoder.encode(usuarioJPA.getPassword()));
 
-            result = usuarioJPADAOImplementation.Add(usuarioJPA);
+            Result addResult = usuarioJPADAOImplementation.Add(usuarioJPA);
+            if (addResult.correct) {
+                Integer idGenerado = (addResult.Object instanceof Integer) ? (Integer) addResult.Object : 0;
+                if (idGenerado > 0) {
+                    Result getResult = usuarioJPADAOImplementation.GetById(idGenerado);
+                    UsuarioJPA saved = getResult.correct ? (UsuarioJPA) getResult.Object : null;
 
-            if (result.correct) {
-                emailService.sendVerificationEmail(
-                        usuarioJPA.getIdUsuario(),
-                        usuarioJPA.getEmail(),
-                        baseUrl);
+                    emailService.sendVerificationEmail(idGenerado, usuarioJPA.getEmail(), baseUrl);
 
-                result.Object = "Usuario registrado correctamente. Por favor, verifica tu correo electrónico.";
-                result.status = 201;
+                    result.correct = true;
+                    result.status = 201;
+                    result.Object = (saved != null) ? saved : idGenerado;
+                } else {
+                    result.correct = false;
+                    result.status = 500;
+                    result.errorMessage = "No se pudo obtener el id generado";
+                }
+            } else {
+                result.correct = false;
+                result.status = 500;
+                result.errorMessage = "No se pudo persistir el usuario";
             }
 
         } catch (Exception ex) {
@@ -108,14 +116,14 @@ public class UsuarioRestController {
             result.errorMessage = ex.getMessage();
             result.status = 500;
         }
-
         return ResponseEntity.status(result.status).body(result);
     }
 
     @GetMapping("/search")
     public ResponseEntity<Result> SearchUsuarios(@RequestParam(required = false) String nombre,
             @RequestParam(required = false) String apellidoPaterno,
-            @RequestParam(required = false) String apellidoMaterno, @RequestParam(required = false) Integer idRol) {
+            @RequestParam(required = false) String apellidoMaterno,
+            @RequestParam(required = false) Integer idRol) {
         Result result = new Result();
         try {
             result = usuarioJPADAOImplementation.searchUsuario(nombre, apellidoPaterno, apellidoMaterno, idRol);
@@ -218,6 +226,4 @@ public class UsuarioRestController {
         }
     }
 
-
-    // Usuario
 }

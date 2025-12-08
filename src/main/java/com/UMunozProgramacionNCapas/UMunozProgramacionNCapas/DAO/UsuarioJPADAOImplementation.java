@@ -43,40 +43,43 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         return result;
     }
 
-    @Transactional
-    @Override
-    public Result Add(UsuarioJPA usuarioJPA) {
-        Result result = new Result();
-
-        try {
-            if (usuarioJPA == null) {
-                result.correct = false;
-                result.errorMessage = "El usuario llegó vacío o hubo un problema";
-                result.status = 400;
-                return result;
-            }
-
-            usuarioJPA.setVerified(false);
-
-            if (usuarioJPA.Direcciones == null || usuarioJPA.Direcciones.isEmpty()) {
-                entityManager.persist(usuarioJPA);
-            } else {
-                usuarioJPA.Direcciones.get(0).setUsuario(usuarioJPA);
-                entityManager.merge(usuarioJPA);
-            }
-
-            result.correct = true;
-            result.status = 201;
-            result.Object = usuarioJPA.getIdUsuario();
-
-        } catch (Exception ex) {
+   @Transactional
+@Override
+public Result Add(UsuarioJPA usuarioJPA) {
+    Result result = new Result();
+    try {
+        if (usuarioJPA == null) {
             result.correct = false;
-            result.errorMessage = ex.getMessage();
-            result.status = 500;
+            result.errorMessage = "El usuario llegó vacío o hubo un problema";
+            result.status = 400;
+            return result;
         }
 
-        return result;
+        usuarioJPA.setVerified(false);
+
+        UsuarioJPA managed;
+        if (usuarioJPA.getDirecciones() == null || usuarioJPA.getDirecciones().isEmpty()) {
+            entityManager.persist(usuarioJPA);
+            entityManager.flush();           // fuerza generación de ID
+            managed = usuarioJPA;
+        } else {
+            // asegúrate de setear el usuario en cada dirección
+            usuarioJPA.getDirecciones().forEach(d -> d.setUsuario(usuarioJPA));
+            managed = entityManager.merge(usuarioJPA); // merge retorna entidad gestionada
+            entityManager.flush();
+        }
+
+        result.correct = true;
+        result.status = 201;
+        result.Object = managed.getIdUsuario(); // ya no será 0
+    } catch (Exception ex) {
+        result.correct = false;
+        result.errorMessage = ex.getMessage();
+        result.status = 500;
     }
+    return result;
+}
+
 
     @Override
     public Result GetById(int IdUsuario) {
