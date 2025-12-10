@@ -2,6 +2,7 @@ package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Configuration;
 
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Security.AuthTokenFilter;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.Service.UserDetailsJPAService;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -43,6 +45,7 @@ public class SpringSecurityConfiguration {
 
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -51,19 +54,16 @@ public class SpringSecurityConfiguration {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // ===== ENDPOINTS PÚBLICOS (SIN TOKEN) =====
                         .requestMatchers("/api/login", "/login").permitAll()
-                        .requestMatchers("/api/usuario/verify/**").permitAll() // verificación por correo
-                        .requestMatchers("/usuario**").permitAll()          // vista de registro (cliente)
-                        .requestMatchers(HttpMethod.POST, "/api/usuario/add").permitAll() // registrar usuario (REST)
+                        .requestMatchers("/api/usuario/verify/**").permitAll()
 
-                        // ===== EJEMPLO DE ENDPOINTS PROTEGIDOS =====
-                        // .requestMatchers("/usuario/**").hasAuthority("ROLE_Administrador")
-                        // .requestMatchers("/usuario/add**").hasAuthority("ROLE_Administrador")
-                        // .requestMatchers(HttpMethod.GET, "/api/usuario").hasAuthority("ROLE_Administrador")
+                        .requestMatchers("/usuario/registro").permitAll()
+
+                        .requestMatchers("/usuario/add/**").hasAuthority("ROLE_Administrador")
+                        .requestMatchers("/usuario/**").hasAuthority("ROLE_Administrador")
+                        .requestMatchers(HttpMethod.GET, "/api/usuario").hasAuthority("ROLE_Administrador")
                         .requestMatchers(HttpMethod.DELETE, "/api/usuario/delete").hasAuthority("ROLE_Administrador")
 
-                        // Cualquier otra cosa requiere autenticación
                         .anyRequest().authenticated()
                 )
 
@@ -83,9 +83,9 @@ public class SpringSecurityConfiguration {
                             response.setContentType("application/json");
                             response.setStatus(401);
                             response.getWriter().write("{\"error\": \"No autorizado (Token inválido o faltante)\"}");
-                        }));
+                        }
+                ));
 
-        // Filtro JWT antes del filtro de login
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -101,6 +101,7 @@ public class SpringSecurityConfiguration {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 
