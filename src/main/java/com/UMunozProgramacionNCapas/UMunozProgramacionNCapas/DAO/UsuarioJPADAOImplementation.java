@@ -43,43 +43,42 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         return result;
     }
 
-   @Transactional
-@Override
-public Result Add(UsuarioJPA usuarioJPA) {
-    Result result = new Result();
-    try {
-        if (usuarioJPA == null) {
+    @Transactional
+    @Override
+    public Result Add(UsuarioJPA usuarioJPA) {
+        Result result = new Result();
+        try {
+            if (usuarioJPA == null) {
+                result.correct = false;
+                result.errorMessage = "El usuario llegó vacío o hubo un problema";
+                result.status = 400;
+                return result;
+            }
+
+            usuarioJPA.setVerified(false);
+
+            UsuarioJPA managed;
+            if (usuarioJPA.getDirecciones() == null || usuarioJPA.getDirecciones().isEmpty()) {
+                entityManager.persist(usuarioJPA);
+                entityManager.flush(); // fuerza generación de ID
+                managed = usuarioJPA;
+            } else {
+                // asegúrate de setear el usuario en cada dirección
+                usuarioJPA.getDirecciones().forEach(d -> d.setUsuario(usuarioJPA));
+                managed = entityManager.merge(usuarioJPA); // merge retorna entidad gestionada
+                entityManager.flush();
+            }
+
+            result.correct = true;
+            result.status = 201;
+            result.Object = managed.getIdUsuario(); // ya no será 0
+        } catch (Exception ex) {
             result.correct = false;
-            result.errorMessage = "El usuario llegó vacío o hubo un problema";
-            result.status = 400;
-            return result;
+            result.errorMessage = ex.getMessage();
+            result.status = 500;
         }
-
-        usuarioJPA.setVerified(false);
-
-        UsuarioJPA managed;
-        if (usuarioJPA.getDirecciones() == null || usuarioJPA.getDirecciones().isEmpty()) {
-            entityManager.persist(usuarioJPA);
-            entityManager.flush();           // fuerza generación de ID
-            managed = usuarioJPA;
-        } else {
-            // asegúrate de setear el usuario en cada dirección
-            usuarioJPA.getDirecciones().forEach(d -> d.setUsuario(usuarioJPA));
-            managed = entityManager.merge(usuarioJPA); // merge retorna entidad gestionada
-            entityManager.flush();
-        }
-
-        result.correct = true;
-        result.status = 201;
-        result.Object = managed.getIdUsuario(); // ya no será 0
-    } catch (Exception ex) {
-        result.correct = false;
-        result.errorMessage = ex.getMessage();
-        result.status = 500;
+        return result;
     }
-    return result;
-}
-
 
     @Override
     public Result GetById(int IdUsuario) {
@@ -269,52 +268,44 @@ public Result Add(UsuarioJPA usuarioJPA) {
     }
 
     @Override
-    public Result searchUsuario(String nombre, String apellidoPaterno, String apellidoMaterno, Integer idRol) {
-        Result result = new Result();
+    public Result searchUsuario(String nombre, String ap, String am, Integer idRol, Boolean status) {
+        Result r = new Result();
         try {
-            StringBuilder jpql = new StringBuilder("SELECT u FROM UsuarioJPA u LEFT JOIN FETCH u.rol WHERE 1=1");
-
-            if (nombre != null && !nombre.trim().isEmpty()) {
+            StringBuilder jpql = new StringBuilder(
+                    "SELECT DISTINCT u FROM UsuarioJPA u LEFT JOIN u.rol r WHERE 1=1");
+            if (nombre != null && !nombre.isBlank())
                 jpql.append(" AND LOWER(u.Nombre) LIKE LOWER(:nombre)");
-            }
-            if (apellidoPaterno != null && !apellidoPaterno.trim().isEmpty()) {
-                jpql.append(" AND LOWER(u.ApellidoPaterno) LIKE LOWER(:apellidoPaterno)");
-            }
-            if (apellidoMaterno != null && !apellidoMaterno.trim().isEmpty()) {
-                jpql.append(" AND LOWER(u.ApellidoMaterno) LIKE LOWER(:apellidoMaterno)");
-            }
-            if (idRol != null && idRol > 0) {
-                jpql.append(" AND u.rol.idRol = :idRol");
-            }
+            if (ap != null && !ap.isBlank())
+                jpql.append(" AND LOWER(u.ApellidoPaterno) LIKE LOWER(:ap)");
+            if (am != null && !am.isBlank())
+                jpql.append(" AND LOWER(u.ApellidoMaterno) LIKE LOWER(:am)");
+            if (idRol != null && idRol > 0)
+                jpql.append(" AND r.idRol = :idRol"); 
+            if (status != null)
+                jpql.append(" AND u.Status = :status"); 
 
-            TypedQuery<UsuarioJPA> query = entityManager.createQuery(jpql.toString(), UsuarioJPA.class);
+            TypedQuery<UsuarioJPA> q = entityManager.createQuery(jpql.toString(), UsuarioJPA.class);
+            if (nombre != null && !nombre.isBlank())
+                q.setParameter("nombre", "%" + nombre.trim() + "%");
+            if (ap != null && !ap.isBlank())
+                q.setParameter("ap", "%" + ap.trim() + "%");
+            if (am != null && !am.isBlank())
+                q.setParameter("am", "%" + am.trim() + "%");
+            if (idRol != null && idRol > 0)
+                q.setParameter("idRol", idRol);
+            if (status != null)
+                q.setParameter("status", status);
 
-            if (nombre != null && !nombre.trim().isEmpty()) {
-                query.setParameter("nombre", "%" + nombre.trim() + "%");
-            }
-            if (apellidoPaterno != null && !apellidoPaterno.trim().isEmpty()) {
-                query.setParameter("apellidoPaterno", "%" + apellidoPaterno.trim() + "%");
-            }
-            if (apellidoMaterno != null && !apellidoMaterno.trim().isEmpty()) {
-                query.setParameter("apellidoMaterno", "%" + apellidoMaterno.trim() + "%");
-            }
-            if (idRol != null && idRol > 0) {
-                query.setParameter("idRol", idRol);
-            }
-
-            List<UsuarioJPA> usuarios = query.getResultList();
-
-            result.Object = usuarios;
-            result.correct = true;
-            result.status = 200;
-
+            r.Object = q.getResultList();
+            r.correct = true;
+            r.status = 200;
         } catch (Exception ex) {
-            result.correct = false;
-            result.errorMessage = ex.getMessage();
-            result.status = 500;
-            result.ex = ex;
+            r.correct = false;
+            r.errorMessage = ex.getMessage();
+            r.status = 500;
+            r.ex = ex;
         }
-        return result;
+        return r;
     }
 
     @Override

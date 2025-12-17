@@ -19,7 +19,7 @@ public interface IUsuarioJPA {
     
     Result UpdateDireccion(DireccionJPA direccionJPA, int IdUsuario, int IdDireccion);
     
-    Result searchUsuario(String nombre, String apellidoPaterno, String apellidoMaterno, Integer idRol);
+    Result searchUsuario(String nombre, String ap, String am, Integer idRol, Boolean status);
 
     Result verifyUser(int idUsuario);
     

@@ -123,10 +123,11 @@ public class UsuarioRestController {
     public ResponseEntity<Result> SearchUsuarios(@RequestParam(required = false) String nombre,
             @RequestParam(required = false) String apellidoPaterno,
             @RequestParam(required = false) String apellidoMaterno,
-            @RequestParam(required = false) Integer idRol) {
+            @RequestParam(required = false) Integer idRol,
+            @RequestParam(required = false) Boolean status) {
         Result result = new Result();
         try {
-            result = usuarioJPADAOImplementation.searchUsuario(nombre, apellidoPaterno, apellidoMaterno, idRol);
+            result = usuarioJPADAOImplementation.searchUsuario(nombre, apellidoPaterno, apellidoMaterno, idRol, status);
             result.correct = true;
             result.status = 200;
         } catch (Exception ex) {
