@@ -6,10 +6,9 @@ import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 
 public interface IDireccion {
 
-    Result GetByIdDireccion(int IdDireccion);
-    
+     Result GetByIdDireccion(int IdDireccion);
     Result DeleteDireccion(int IdDireccion);
-    
-    Result AddDireccion(DireccionJPA direccionJPA,int IdUsuario);
+    Result AddDireccion(DireccionJPA direccionJPA, int IdUsuario);
+    Result UpdateDireccion(DireccionJPA direccionJPA, int IdUsuario);
     
 }
