@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/direccion")
+@RequestMapping("/api/direccion") // ← con slash inicial
 public class DireccionRestController {
 
     @Autowired
@@ -45,7 +45,7 @@ public class DireccionRestController {
 
     @PostMapping("/add/{IdUsuario}")
     public ResponseEntity<Result> AddDireccion(@RequestBody DireccionJPA direccionJPA,
-                                               @PathVariable("IdUsuario") int IdUsuario) {
+            @PathVariable("IdUsuario") int IdUsuario) {
         Result result;
         try {
             result = direccionJPADAOImplementation.AddDireccion(direccionJPA, IdUsuario);

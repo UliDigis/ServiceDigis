@@ -23,14 +23,13 @@ public class DireccionJPADAOImplementation implements IDireccion {
         try {
             TypedQuery<DireccionJPA> query = entityManager.createQuery(
                     "FROM DireccionJPA d WHERE d.IdDireccion = :IdDireccion",
-                    DireccionJPA.class
-            );
+                    DireccionJPA.class);
             query.setParameter("IdDireccion", IdDireccion);
 
             List<DireccionJPA> list = query.getResultList();
 
             if (list != null && !list.isEmpty()) {
-                result.Object = list.get(0); // ✅ devolver objeto, no lista (para tu JS)
+                result.Object = list.get(0); // devolver objeto, no lista
                 result.correct = true;
                 result.status = 200;
             } else {
@@ -56,8 +55,7 @@ public class DireccionJPADAOImplementation implements IDireccion {
         try {
             TypedQuery<DireccionJPA> query = entityManager.createQuery(
                     "FROM DireccionJPA d WHERE d.IdDireccion = :IdDireccion",
-                    DireccionJPA.class
-            );
+                    DireccionJPA.class);
             query.setParameter("IdDireccion", IdDireccion);
 
             List<DireccionJPA> list = query.getResultList();
@@ -72,7 +70,6 @@ public class DireccionJPADAOImplementation implements IDireccion {
                 result.status = 404;
                 result.errorMessage = "Dirección no encontrada";
             }
-
         } catch (Exception ex) {
             result.correct = false;
             result.status = 500;
@@ -139,9 +136,11 @@ public class DireccionJPADAOImplementation implements IDireccion {
                 return result;
             }
 
-            // ✅ necesitas IdDireccion para editar
             Integer idDir = null;
-            try { idDir = direccionJPA.getIdDireccion(); } catch (Exception ignored) {}
+            try {
+                idDir = direccionJPA.getIdDireccion();
+            } catch (Exception ignored) {
+            }
             if (idDir == null || idDir == 0) {
                 result.correct = false;
                 result.status = 400;
@@ -180,7 +179,6 @@ public class DireccionJPADAOImplementation implements IDireccion {
                 return result;
             }
 
-            // ✅ Copiar campos editables (ajusta si tus nombres difieren)
             existente.setCalle(direccionJPA.getCalle());
             existente.setNumeroExterior(direccionJPA.getNumeroExterior());
             existente.setNumeroInterior(direccionJPA.getNumeroInterior());

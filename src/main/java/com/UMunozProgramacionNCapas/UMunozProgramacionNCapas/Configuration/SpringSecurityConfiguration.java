@@ -53,19 +53,17 @@ public class SpringSecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers("/api/login", "/login").permitAll()
                         .requestMatchers("/api/usuario/verify/**").permitAll()
-
                         .requestMatchers("/usuario/registro").permitAll()
 
                         .requestMatchers("/usuario/add/**").hasAuthority("ROLE_Administrador")
                         .requestMatchers("/usuario/**").hasAuthority("ROLE_Administrador")
                         .requestMatchers(HttpMethod.GET, "/api/usuario").hasAuthority("ROLE_Administrador")
                         .requestMatchers(HttpMethod.DELETE, "/api/usuario/delete").hasAuthority("ROLE_Administrador")
+                        .requestMatchers(HttpMethod.DELETE, "/api/direccion/**").hasAuthority("ROLE_Administrador")
 
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
 
                 .formLogin(form -> form.disable())
 
@@ -75,16 +73,14 @@ public class SpringSecurityConfiguration {
                             response.setStatus(200);
                             response.sendRedirect("/login");
                         })
-                        .permitAll()
-                )
+                        .permitAll())
 
                 .exceptionHandling(e -> e.authenticationEntryPoint(
                         (request, response, authException) -> {
                             response.setContentType("application/json");
                             response.setStatus(401);
                             response.getWriter().write("{\"error\": \"No autorizado (Token inválido o faltante)\"}");
-                        }
-                ));
+                        }));
 
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
