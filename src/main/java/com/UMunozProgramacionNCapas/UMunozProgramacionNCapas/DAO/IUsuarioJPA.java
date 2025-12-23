@@ -2,8 +2,8 @@ package com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.DAO;
 
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.DireccionJPA;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.Result;
-//import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.ML.Usuario;
 import com.UMunozProgramacionNCapas.UMunozProgramacionNCapas.JPA.UsuarioJPA;
+import java.util.List;
 
 public interface IUsuarioJPA {
 
@@ -23,4 +23,5 @@ public interface IUsuarioJPA {
 
     Result verifyUser(int idUsuario);
     
+    Result CargaMasiva(List<UsuarioJPA> usuarios);   
 }

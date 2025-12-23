@@ -21,8 +21,7 @@ public class DireccionJPADAOImplementation implements IDireccion {
     public Result GetByIdDireccion(int IdDireccion) {
         Result result = new Result();
         try {
-            TypedQuery<DireccionJPA> query = entityManager.createQuery(
-                    "FROM DireccionJPA d WHERE d.IdDireccion = :IdDireccion",
+            TypedQuery<DireccionJPA> query = entityManager.createQuery("FROM DireccionJPA d WHERE d.IdDireccion = :IdDireccion",
                     DireccionJPA.class);
             query.setParameter("IdDireccion", IdDireccion);
 
@@ -53,8 +52,7 @@ public class DireccionJPADAOImplementation implements IDireccion {
     public Result DeleteDireccion(int IdDireccion) {
         Result result = new Result();
         try {
-            TypedQuery<DireccionJPA> query = entityManager.createQuery(
-                    "FROM DireccionJPA d WHERE d.IdDireccion = :IdDireccion",
+            TypedQuery<DireccionJPA> query = entityManager.createQuery("FROM DireccionJPA d WHERE d.IdDireccion = :IdDireccion",
                     DireccionJPA.class);
             query.setParameter("IdDireccion", IdDireccion);
 

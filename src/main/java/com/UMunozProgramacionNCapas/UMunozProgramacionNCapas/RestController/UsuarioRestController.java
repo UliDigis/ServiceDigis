@@ -178,13 +178,12 @@ public class UsuarioRestController {
             @PathVariable("IdDireccion") int IdDireccion,
             @RequestBody DireccionJPA direccionJPA) {
 
+        Result result;
+
         try {
-
             result = usuarioJPADAOImplementation.UpdateDireccion(direccionJPA, IdUsuario, IdDireccion);
-            result.correct = true;
-            result.status = 200;
-
         } catch (Exception ex) {
+            result = new Result();
             result.correct = false;
             result.errorMessage = ex.getMessage();
             result.ex = ex;
